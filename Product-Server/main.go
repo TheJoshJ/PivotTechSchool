@@ -1,33 +1,48 @@
 package main
 
 import (
+	"PivotTechSchool/Product-Server/api/handler"
+	"PivotTechSchool/Product-Server/models"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"product-server/api/handler"
+	"os"
 )
 
-type Connect struct {
+type server struct {
 	Router *mux.Router
 }
 
-func main() {
-	c := Connect{}
-	c.Router = mux.NewRouter()
-	log.Println("Router Created")
+var Products []models.Product
 
+func main() {
+	s := server{}
+	s.Router = mux.NewRouter()
+
+	initProducts("obj/products.json")
+
+	log.Println("Router Created")
 	log.Println("Loading Routes...")
 
-	c.Router.HandleFunc("/products", api.GetProducts).Methods("GET")
-	c.Router.HandleFunc("/products", api.AddProduct).Methods("POST")
-	c.Router.HandleFunc("/products/{id}", api.GetProductByID).Methods("GET")
-	c.Router.HandleFunc("/products/{id}", api.UpdateProductByID).Methods("PUT")
-	c.Router.HandleFunc("/products/{id}", api.DeleteProductByID).Methods("DELETE")
+	s.Router.HandleFunc("/products", api.GetProducts).Methods("GET")
+	s.Router.HandleFunc("/products", api.AddProduct).Methods("POST")
+	s.Router.HandleFunc("/products/{id}", api.GetProductByID).Methods("GET")
+	s.Router.HandleFunc("/products/{id}", api.UpdateProductByID).Methods("PUT")
+	s.Router.HandleFunc("/products/{id}", api.DeleteProductByID).Methods("DELETE")
 	log.Println("Loaded Routes!")
 
 	log.Println("Starting server on port 8080")
-	err := http.ListenAndServe(":8080", c.Router)
+	log.Fatal(http.ListenAndServe(":8080", s.Router))
+}
+
+func initProducts(filepath string) {
+	data, err := os.ReadFile(filepath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to read products list - %s.", err)
+		return
+	}
+	if err = json.Unmarshal(data, &Products); err != nil {
+		log.Fatalf("Error unmarshalling products list - %s", err)
 	}
 }

@@ -1,25 +1,16 @@
 package api
 
 import (
+	"PivotTechSchool/Product-Server/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
-	"product-server/models"
 	"strconv"
 )
 
 func GetProducts(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("products.json")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var products []models.Product
-	err = json.Unmarshal(data, &products)
-
-	if err := json.NewEncoder(w).Encode(products); err != nil {
+	if err := json.NewEncoder(w).Encode(&models.Products); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -27,7 +18,7 @@ func GetProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddProduct(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("products.json")
+	data, err := os.ReadFile("obj/products.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -77,7 +68,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, err := os.Create("products.json")
+	file, err := os.Create("obj/products.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -99,7 +90,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 
 func GetProductByID(w http.ResponseWriter, r *http.Request) {
 
-	data, err := os.ReadFile("products.json")
+	data, err := os.ReadFile("obj/products.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -130,7 +121,7 @@ func GetProductByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateProductByID(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("products.json")
+	data, err := os.ReadFile("obj/products.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -172,7 +163,7 @@ func UpdateProductByID(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			file, err := os.Create("products.json")
+			file, err := os.Create("obj/products.json")
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -198,7 +189,7 @@ func UpdateProductByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteProductByID(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("products.json")
+	data, err := os.ReadFile("obj/products.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -224,7 +215,7 @@ func DeleteProductByID(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			file, err := os.Create("products.json")
+			file, err := os.Create("obj/products.json")
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
