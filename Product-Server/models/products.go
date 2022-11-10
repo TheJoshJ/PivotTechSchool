@@ -1,5 +1,7 @@
 package models
 
+var Products []Product
+
 type Product struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
