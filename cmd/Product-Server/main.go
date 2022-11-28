@@ -1,16 +1,60 @@
-package api
+package main
 
 import (
-	"PivotTechSchool/Product-Server/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 )
 
+type server struct {
+	Router *mux.Router
+}
+
+var Products []Product
+
+type Product struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
+}
+
+func main() {
+	s := server{}
+	s.Router = mux.NewRouter()
+
+	initProducts("obj/products.json")
+
+	log.Println("Router Created")
+	log.Println("Loading Routes...")
+
+	s.Router.HandleFunc("/products", GetProducts).Methods("GET")
+	s.Router.HandleFunc("/products", AddProduct).Methods("POST")
+	s.Router.HandleFunc("/products/{id}", GetProductByID).Methods("GET")
+	s.Router.HandleFunc("/products/{id}", UpdateProductByID).Methods("PUT")
+	s.Router.HandleFunc("/products/{id}", DeleteProductByID).Methods("DELETE")
+	log.Println("Loaded Routes!")
+
+	log.Println("Starting server on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", s.Router))
+}
+
+func initProducts(filepath string) {
+	data, err := os.ReadFile(filepath)
+	if err != nil {
+		log.Fatalf("Failed to read products list - %s.", err)
+		return
+	}
+	if err = json.Unmarshal(data, &Products); err != nil {
+		log.Fatalf("Error unmarshalling products list - %s", err)
+	}
+}
+
 func GetProducts(w http.ResponseWriter, r *http.Request) {
-	if err := json.NewEncoder(w).Encode(&models.Products); err != nil {
+	if err := json.NewEncoder(w).Encode(&Products); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -24,7 +68,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 	err = json.Unmarshal(data, &products)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -53,7 +97,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	newProduct := models.Product{
+	newProduct := Product{
 		ID:          id,
 		Price:       price,
 		Name:        r.FormValue("name"),
@@ -103,7 +147,7 @@ func GetProductByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 	err = json.Unmarshal(data, &products)
 
 	for _, product := range products {
@@ -127,7 +171,7 @@ func UpdateProductByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 	err = json.Unmarshal(data, &products)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -146,7 +190,7 @@ func UpdateProductByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newProduct := models.Product{
+	newProduct := Product{
 		ID:          id,
 		Price:       price,
 		Name:        r.FormValue("name"),
@@ -202,7 +246,7 @@ func DeleteProductByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 	err = json.Unmarshal(data, &products)
 
 	for i, product := range products {
