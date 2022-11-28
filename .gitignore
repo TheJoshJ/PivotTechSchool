@@ -5,6 +5,9 @@
 _obj
 _test
 
+# Files
+.env
+
 # Editor Settings
 .idea
 .vscode
