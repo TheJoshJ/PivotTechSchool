@@ -1,7 +1,7 @@
 package calculator_test
 
 import (
-	"PivotTechSchool/Calculator"
+	"PivotTechSchool/calculator"
 	"testing"
 )
 
