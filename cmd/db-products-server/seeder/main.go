@@ -9,7 +9,8 @@ import (
 )
 
 type Database struct {
-	DB *gorm.DB
+	DB  *gorm.DB
+	log *log.Logger
 }
 
 type Product struct {
@@ -37,7 +38,7 @@ func main() {
 		log.Fatalf("error loading JSON")
 	}
 
-	err = addToDB(fileByte, db.DB)
+	err = addToDB(fileByte, db)
 	if err != nil {
 		log.Fatalf("unable to create databse\n%v", err)
 	}
@@ -77,19 +78,26 @@ func loadJSON() ([]byte, error) {
 	return file, nil
 }
 
-func addToDB(b []byte, db *gorm.DB) error {
+func addToDB(b []byte, db Database) error {
 	var products []Product
+	var productsReturn []Product
 
 	if err := json.Unmarshal(b, &products); err != nil {
 		return err
 	}
 
 	for _, product := range products {
-		db.Create(&product)
+		db.DB.Create(&product)
 	}
 
-	for i := 1; i <= 5; i++ {
-		db.Debug().Where(&Product{ProductID: i}).First(&products)
-	}
+	db.DB.Table("products").Select("*").Limit(5).Scan(&productsReturn)
+	log.Println(productsReturn)
+
+	/*
+		OUTPUT:
+		[{1 Water - San Pellegrino curae nulla dapibus dolor vel est donec odio justo sollicitudin ut suscipit a feugiat et eros vestibulum ac est lacinia 80} {2 Cape Capensis - Fillet rutrum neque aenean auctor gravida
+		sem praesent id massa id nisl venenatis lacinia aenean sit amet justo morbi ut odio 53} {3 Bread - Bistro Sour ac est lacinia nisi venenatis tristique fusce congue diam id 22} {5 Lettuce - Arugula vel nisl duis ac nibh fusce lacus p
+		urus aliquet at feugiat non pretium 11} {6 Kahlua porttitor lorem id ligula suspendisse ornare consequat lectus in est risus auctor sed tristique in tempus sit 82}]
+	*/
 	return nil
 }
