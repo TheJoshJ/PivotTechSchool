@@ -50,6 +50,7 @@ This part of your assignment calls for refactoring your existing product serverâ
 4. Do not crash your own server with `log.Fatal` within your handlers.
 
 
+
 # Outputs
 ```
 localhost:8080/products?limit=3&sort=price
