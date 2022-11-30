@@ -1,7 +1,7 @@
 package main
 
 import (
-	"PivotTechSchool/Calculator"
+	"PivotTechSchool/calculator"
 	"fmt"
 )
 
